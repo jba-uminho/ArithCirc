@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
-#split(' ', 1) faz split com o caracter ' ' mas só 1 vez!
 
-#######produzir os polinomios
-#print P.lagrange_polynomial([(0,0),(2,4)]) % construirT([1,2,3])
-#print P.lagrange_polynomial([(0,0),(2,4)]) % P.lagrange_polynomial([(0,0),(1,1)])
-
-
-#from aux import * # importar tudo que esta no ficheiro aux.py
 from sage.all import * # importar tudo do sage
-
 
 def construirT(listaRaizes):
 	x = var('x')
