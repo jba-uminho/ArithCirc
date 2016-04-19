@@ -11,21 +11,130 @@ def construirT(listaRaizes):
 
 def construirConjPolinomios(ops,V,W,Y,nRaizes):
 	contaRaiz = 0 #diz-nos qual gate de mutiplicacao (raiz) estamos
-	contaOps = 0 # conta operaçoes de input e multiplicacao,diz-nos qual operacao estamos (input,mult)
+	contaOps = 0 # conta operaçoes de input e multiplicacao, indica em qual indice dos vetores V,W e Y os polinomios relativos a cada input e mutiplicacao devem ser colocados
 
-	#neste momento este for esta a produzir o Y, o conjunto de polinomios de saida das gates de mutiplicacao
+	#
 	for i in range(0,len(ops)):
 		if ops[i].split(' ', 1)[0] == "input":
+			###    Y
 			aux = []
 			for j in range (0,nRaizes):
 				aux.append((j+1,0))
 
 			Y[contaOps] = P.lagrange_polynomial(aux)
+			###   fim Y	
+
 			contaOps += 1
 
 		elif ops[i].split(' ', 1)[0] == "mult":
-			contaRaiz += 1
+			contaRaiz += 1 # diz em que gate mutiplicacao estamos,os polinomios tem que ter valor 1 nesta raiz e zero nas outras
+			
+			###   V
+			aux = []
+			indiceEsq = int(ops[i].split(' ', 3)[1])
+			if ops[indiceEsq -1].split(' ', 1)[0] == "input":
+				for j in range (0,nRaizes):
+					if j+1 == contaRaiz:
+						aux.append((contaRaiz,1))
+					else:
+						aux.append((j+1,0))
+				V[indiceEsq - 1] = P.lagrange_polynomial(aux)
+			elif ops[indiceEsq - 1].split(' ', 1)[0] == "mult":
+				nAdds = int(ops[indiceEsq - 1].split(' ', 3)[3])# n de "add" antes desta mult		
+				for j in range (0,nRaizes):
+					if j+1 == contaRaiz:
+						aux.append((contaRaiz,1))
+					else:
+						aux.append((j+1,0))
+				V[indiceEsq - 1 - nAdds] = P.lagrange_polynomial(aux)
+			elif ops[indiceEsq - 1].split(' ', 1)[0] == "add":
+				stack = []
+				nItems = 0
 
+				stack.append(int(ops[indiceEsq - 1].split(' ', 2)[1]))
+				stack.append(int(ops[indiceEsq - 1].split(' ', 2)[2]))
+				nItems += 2
+
+				while nItems > 0:
+					k = stack[nItems-1] # k (elemento no topo da stack) é o indice do vetor ops que vamos analisar se é mult,add ou input
+					nItems -= 1
+					
+					aux = []
+					if ops[k-1].split(' ', 1)[0] == "input":
+						for j in range (0,nRaizes):
+							if j+1 == contaRaiz:
+								aux.append((contaRaiz,1))
+							else:
+								aux.append((j+1,0))
+						V[k-1] = P.lagrange_polynomial(aux)
+					elif ops[k-1].split(' ', 1)[0] == "mult":
+						nAdds = int(ops[k - 1].split(' ', 3)[3])# n de "add" antes desta mult		
+						for j in range (0,nRaizes):
+							if j+1 == contaRaiz:
+								aux.append((contaRaiz,1))
+							else:
+								aux.append((j+1,0))
+						V[k - 1 - nAdds] = P.lagrange_polynomial(aux)
+					elif ops[k-1].split(' ', 1)[0] == "add":
+						stack.append(int(ops[k - 1].split(' ', 2)[1]))
+						stack.append(int(ops[k - 1].split(' ', 2)[2]))
+						nItems += 2
+									
+			###   fim V
+
+			###   W
+			aux = []
+			indiceDir = int(ops[i].split(' ', 3)[2])
+			if ops[indiceDir - 1].split(' ', 1)[0] == "input":
+				for j in range (0,nRaizes):
+					if j+1 == contaRaiz:
+						aux.append((contaRaiz,1))
+					else:
+						aux.append((j+1,0))
+				W[indiceDir - 1] = P.lagrange_polynomial(aux)
+			elif ops[indiceDir - 1].split(' ', 1)[0] == "mult":
+				nAdds = int(ops[indiceDir - 1].split(' ', 3)[3])# n de "add" antes desta mult		
+				for j in range (0,nRaizes):
+					if j+1 == contaRaiz:
+						aux.append((contaRaiz,1))
+					else:
+						aux.append((j+1,0))
+				W[indiceDir - 1 - nAdds] = P.lagrange_polynomial(aux)
+			elif ops[indiceDir - 1].split(' ', 1)[0] == "add":
+				stack = []
+				nItems = 0
+
+				stack.append(int(ops[indiceDir - 1].split(' ', 2)[1]))
+				stack.append(int(ops[indiceDir - 1].split(' ', 2)[2]))
+				nItems += 2
+
+				while nItems > 0:
+					k = stack[nItems-1] # k (elemento no topo da stack) é o indice do vetor ops que vamos analisar se é mult,add ou input
+					nItems -= 1
+					
+					aux = []
+					if ops[k-1].split(' ', 1)[0] == "input":
+						for j in range (0,nRaizes):
+							if j+1 == contaRaiz:
+								aux.append((contaRaiz,1))
+							else:
+								aux.append((j+1,0))
+						V[k-1] = P.lagrange_polynomial(aux)
+					elif ops[k-1].split(' ', 1)[0] == "mult":
+						nAdds = int(ops[k - 1].split(' ', 3)[3])# n de "add" antes desta mult		
+						for j in range (0,nRaizes):
+							if j+1 == contaRaiz:
+								aux.append((contaRaiz,1))
+							else:
+								aux.append((j+1,0))
+						V[k - 1 - nAdds] = P.lagrange_polynomial(aux)
+					elif ops[k-1].split(' ', 1)[0] == "add":
+						stack.append(int(ops[k - 1].split(' ', 2)[1]))
+						stack.append(int(ops[k - 1].split(' ', 2)[2]))
+						nItems += 2
+			###   fim W
+						
+			###   Y
 			aux = []
 			for j in range (0,nRaizes):
 				if j+1 == contaRaiz:
@@ -34,8 +143,19 @@ def construirConjPolinomios(ops,V,W,Y,nRaizes):
 					aux.append((j+1,0))
 
 			Y[contaOps] = P.lagrange_polynomial(aux)
+			###  fim Y
+
 			contaOps += 1
-	return Y
+
+	#no V,W e Y os indicies que tiverem o valor "#" será adicionado lá o polinomio 0
+	#um indice nos vetors de polinomios ter o valor "#" siginica que nesse indice a operaçao nao é esquerda,direita ou resultado de uma mult (raiz)
+	for i in range(0,len(V)):
+		if V[i] == '#':
+			V[i] = 0
+		if W[i] == '#':
+			W[i] = 0
+
+	return V,W,Y
 
 
 
@@ -44,9 +164,10 @@ V = []
 W = []
 Y = []
 
-P = PolynomialRing(QQ, 'x')
 
-Zn = IntegerModRing(111) 
+Zn = IntegerModRing(111)
+P = PolynomialRing(QQ, 'x') 
+
 condicao = True # condicao do ciclo que vai receber as linhas de texto do ficheiro
 outPut = None # se no fim outPut for None então algo correu mal ou entao nao foi encontrada a operacao output
 
@@ -54,13 +175,14 @@ ops = [] # vetor que guarda as operaçoes vindas do ficheiro (operaçoes são: i
 valores = [] # valores de todas as operacoes
 C = [] # valores dos inputs e dos resultados das multiplicacoes, ira ser usado na construcaao do polinomio p
 nRaizes = 0
+contaAdd = 0
 
 try:
 	strLida = raw_input()
-	ops.append(strLida)
 	while condicao :
 		# [0] = "input"            [1] = valor do input
 		if strLida.split(' ', 1)[0] == "input":
+			ops.append(strLida)
 			# vai buscar o valor do input e passa para inteiro
 			valores.append(int(strLida.split(' ', 1)[1]))
 			C.append(int(strLida.split(' ', 1)[1]))
@@ -71,13 +193,17 @@ try:
 			Y.append('#')
 
 			strLida = raw_input()
-			ops.append(strLida)
+			
 		elif strLida.split(' ', 1)[0] == "add":
+			ops.append(strLida)
 			# (ex "add 1 2" soma o que esta na posicao 0 com o da posicao 1 do vetor valores e faz o correspontende modulo) 
+			contaAdd += 1
 			valores.append(Zn(valores[int(strLida.split(' ', 2)[1]) -1] + valores[int(strLida.split(' ', 2)[2]) -1]))
 			strLida = raw_input()
-			ops.append(strLida)
+			
 		elif strLida.split(' ', 1)[0] == "mult":
+			#concatena a string lida do ficheiro com o numero de operaçoes "add" antes desta operacao "mult"
+			ops.append( strLida + " " + str(contaAdd))
 			nRaizes += 1 
 			# (ex "mult 1 2" mutiplica o que esta na posicao 0 com o da posicao 1 do vetor valores e faz o correspontende modulo) 
 			valores.append(Zn(valores[int(strLida.split(' ', 2)[1]) -1] * valores[int(strLida.split(' ', 2)[2]) -1]))
@@ -88,8 +214,9 @@ try:
 			Y.append('#')
 
 			strLida = raw_input()
-			ops.append(strLida)
+			
 		elif strLida.split(' ', 1)[0] == "output":
+			ops.append(strLida)
 			outPut = valores[int(strLida.split(' ', 2)[1]) -1]
 			condicao = False
 		else:
@@ -104,15 +231,26 @@ listaRaizes = []
 for i in range(0,nRaizes):
 	listaRaizes.append(i+1)
 
-print ops
-print valores
-print C
-print "outPut = " + str(outPut)
+t = construirT(listaRaizes)
 
-print nRaizes
-print construirT(listaRaizes)
+V,W,Y = construirConjPolinomios(ops,V,W,Y,nRaizes)
 
-print V,W,Y
+resV = 0
+resW = 0
+resY = 0
 
-print construirConjPolinomios(ops,V,W,Y,nRaizes)
+for i in range(0,len(V)):
+	resV += ZZ(C[i]) * V[i]	
+	resW += ZZ(C[i]) * W[i]
+	resY += ZZ(C[i]) * Y[i]
+
+p = resV * resW - resY
+
+# p%t se der zero entao t divide p
+print p % t
+
+
+
+
+
 
